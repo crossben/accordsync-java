@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "strategy": "set",
+  "schema": {
+    "dossier": {
+      "name": "lww",
+      "docs": "set",
+      "visits": "counter",
+      "status": "conflict"
+    }
+  },
+  "cases": [
+    {
+      "name": "a concurrent add wins over a remove",
+      "ops": [
+        {
+          "op_id": "a:1",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1000:00000:a",
+          "element": "cni.pdf"
+        },
+        {
+          "op_id": "b:1",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "remove",
+          "hlc": "1100:00000:b",
+          "element": "cni.pdf",
+          "deps": ["a:1"]
+        },
+        {
+          "op_id": "c:1",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1050:00000:c",
+          "element": "cni.pdf"
+        }
+      ],
+      "expected": {
+        "dossier:1": {
+          "docs": ["cni.pdf"],
+          "visits": 0
+        }
+      }
+    },
+    {
+      "name": "a remove of everything seen removes the element, even if it arrives first",
+      "ops": [
+        {
+          "op_id": "b:1",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "remove",
+          "hlc": "1100:00000:b",
+          "element": "photo.jpg",
+          "deps": ["a:1"]
+        },
+        {
+          "op_id": "a:1",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1000:00000:a",
+          "element": "photo.jpg"
+        },
+        {
+          "op_id": "a:2",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1200:00000:a",
+          "element": 7
+        }
+      ],
+      "expected": {
+        "dossier:1": {
+          "docs": [7],
+          "visits": 0
+        }
+      }
+    },
+    {
+      "name": "a re-add replaces the tags its writer saw; a concurrent remove still loses",
+      "ops": [
+        {
+          "op_id": "a:1",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1000:00000:a",
+          "element": "cni.pdf"
+        },
+        {
+          "op_id": "a:2",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1100:00000:a",
+          "element": "cni.pdf",
+          "deps": ["a:1"]
+        },
+        {
+          "op_id": "b:1",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "remove",
+          "hlc": "1150:00000:b",
+          "element": "cni.pdf",
+          "deps": ["a:1"]
+        },
+        {
+          "op_id": "a:3",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1200:00000:a",
+          "element": "photo.jpg"
+        },
+        {
+          "op_id": "a:4",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1300:00000:a",
+          "element": "photo.jpg",
+          "deps": ["a:3"]
+        },
+        {
+          "op_id": "b:2",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "remove",
+          "hlc": "1400:00000:b",
+          "element": "photo.jpg",
+          "deps": ["a:4"]
+        }
+      ],
+      "expected": {
+        "dossier:1": {
+          "docs": ["cni.pdf"],
+          "visits": 0
+        }
+      }
+    },
+    {
+      "name": "elements sort by UTF-16 code unit: numbers, then 'a', then '😀' (U+1F600, D83D DE00), then U+E000",
+      "ops": [
+        {
+          "op_id": "a:1",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1001:00000:a",
+          "element": ""
+        },
+        {
+          "op_id": "a:2",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1002:00000:a",
+          "element": "😀"
+        },
+        {
+          "op_id": "a:3",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1003:00000:a",
+          "element": "a"
+        },
+        {
+          "op_id": "a:4",
+          "record": "dossier:1",
+          "field": "docs",
+          "kind": "add",
+          "hlc": "1004:00000:a",
+          "element": 2
+        }
+      ],
+      "expected": {
+        "dossier:1": {
+          "docs": [2, "a", "😀", ""],
+          "visits": 0
+        }
+      }
+    }
+  ]
+}

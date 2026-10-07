@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.crossben</groupId>
+        <artifactId>accordsync-parent</artifactId>
+        <version>0.3.0</version>
+    </parent>
+
+    <artifactId>accordsync-client</artifactId>
+    <name>Accord client</name>
+    <description>The Accord client for Java and Kotlin: local-first writes, background sync, conflicts and refusals.</description>
+    <url>https://accord.benhattab.pro</url>
+
+    <dependencies>
+        <dependency><groupId>io.github.crossben</groupId><artifactId>accordsync-core</artifactId></dependency>
+        <dependency><groupId>org.xerial</groupId><artifactId>sqlite-jdbc</artifactId><optional>true</optional></dependency>
+    </dependencies>
+</project>

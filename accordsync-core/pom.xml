@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.crossben</groupId>
+        <artifactId>accordsync-parent</artifactId>
+        <version>0.3.0</version>
+    </parent>
+
+    <artifactId>accordsync-core</artifactId>
+    <name>Accord core</name>
+    <description>Accord's merge core for Java: hybrid logical clocks, operations, lww, counter, set and conflict. No dependencies.</description>
+    <url>https://accord.benhattab.pro</url>
+
+    <dependencies>
+        
+    </dependencies>
+</project>
