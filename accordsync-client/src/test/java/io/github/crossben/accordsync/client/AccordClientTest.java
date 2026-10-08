@@ -761,6 +761,7 @@ class AccordClientTest {
         awa.onSynced(c -> first.countDown());
         awa.start();
         assertThat(first.await(5, TimeUnit.SECONDS)).isTrue();
+        awa.sync(); // joins the first round if it is still ending, so the next one is ours
         java.util.concurrent.atomic.AtomicBoolean wrote = new java.util.concurrent.atomic.AtomicBoolean();
         CountDownLatch pushed = new CountDownLatch(1);
         awa.onSynced(c -> {
