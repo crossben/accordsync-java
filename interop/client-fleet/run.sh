@@ -4,7 +4,7 @@
 #   interop/client-fleet/run.sh                      (from anywhere)
 #   ACCORD_INTEROP_SEEDS=1,2,3,4,5 interop/client-fleet/run.sh
 #   interop/client-fleet/run.sh -Dtest=HttpTest      (extra arguments go to Maven)
-# Needs accordsync-client 0.3.0 in the local Maven repository: `./mvnw -q install -DskipTests` at java/.
+# Needs accordsync-client 0.3.2 in the local Maven repository: `./mvnw -q install -DskipTests` at java/.
 # Set ACCORD_DATABASE_URL to use a PostgreSQL that is already running (CI does).
 # ACCORD_PORT / ACCORD_TEST_PORT pick the server ports (default 8721 / 8722).
 set -euo pipefail

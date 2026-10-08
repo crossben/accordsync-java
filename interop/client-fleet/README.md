@@ -14,7 +14,7 @@ Java and TypeScript Accord clients against the real server (`@accordsync/server`
   goes lossy again. At the end every device must hold byte-identical canonical snapshots and
   nothing pending. One run per seed of `ACCORD_INTEROP_SEEDS` (default `1,2,3`).
 
-The server and TypeScript client are the published npm packages (0.3.0), pinned in
+The server and TypeScript client are the published npm packages (0.3.2), pinned in
 `node/package.json`. The Java tests use `accordsync-client` 0.3.2 from the local Maven repository,
 so install it first.
 
