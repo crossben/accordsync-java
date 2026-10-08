@@ -1,0 +1,16 @@
+# PostgreSQL for the Java client fleet. `./run.sh` starts it, the server, and the tests.
+# Host port 55631, so it can run next to the other Accord interop suites on one machine.
+name: accordsync-java-client-fleet
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: accord-jfleet-pg
+    environment:
+      POSTGRES_USER: accord
+      POSTGRES_PASSWORD: accord
+      POSTGRES_DB: accord
+    ports: ['55631:5432']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U accord']
+      interval: 1s
+      retries: 30

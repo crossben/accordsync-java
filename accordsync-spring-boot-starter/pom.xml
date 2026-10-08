@@ -17,5 +17,17 @@
     <dependencies>
         <dependency><groupId>io.github.crossben</groupId><artifactId>accordsync-server</artifactId></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-autoconfigure</artifactId></dependency>
+        <!-- The app's DataSource: HikariCP and the PostgreSQL driver (Accord's server is PostgreSQL only). -->
+        <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-jdbc</artifactId></dependency>
+        <dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId></dependency>
+        <!-- Provided by the app's web server (Tomcat, Jetty, Undertow through spring-boot-starter-webmvc). -->
+        <dependency><groupId>jakarta.servlet</groupId><artifactId>jakarta.servlet-api</artifactId><scope>provided</scope></dependency>
+        <!-- Only when the app has Actuator: the "accord" health indicator. -->
+        <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-health</artifactId><optional>true</optional></dependency>
+        <!-- Annotations on Health (compile-time only: javac -Xlint reads them). -->
+        <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-annotations</artifactId><optional>true</optional></dependency>
+
+        <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-webmvc</artifactId><scope>test</scope></dependency>
     </dependencies>
 </project>
