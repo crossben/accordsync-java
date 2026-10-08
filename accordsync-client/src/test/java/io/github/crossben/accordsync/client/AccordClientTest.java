@@ -728,10 +728,47 @@ class AccordClientTest {
         awa.start();
         assertThat(first.await(5, TimeUnit.SECONDS)).isTrue();
         CountDownLatch second = new CountDownLatch(1);
-        awa.onSynced(c -> second.countDown());
+        // A round already under way may end before the write is pushed: wait for an empty outbox.
+        awa.onSynced(c -> {
+            if (awa.status().pending() == 0) second.countDown();
+        });
         awa.assign("dossier:1", "zone", "dakar");
         assertThat(second.await(5, TimeUnit.SECONDS)).isTrue(); // well before syncInterval
-        assertThat(awa.status().pending()).isZero();
+        awa.close();
+    }
+
+    @Test
+    void aWriteDuringARoundIsSyncedSoonAfterIt() throws Exception {
+        AccordClient awa = AccordClient.open(AccordClient.options().schema(SCHEMA).storage(new MemoryStorage())
+                .transport(server.transportFor("awa")).deviceId("awa-bg").syncInterval(Duration.ofSeconds(60)));
+        java.util.concurrent.atomic.AtomicBoolean wrote = new java.util.concurrent.atomic.AtomicBoolean();
+        CountDownLatch pushed = new CountDownLatch(1);
+        awa.onSynced(c -> {
+            // Inside the round: the next one must not wait for syncInterval.
+            if (wrote.compareAndSet(false, true)) awa.assign("dossier:1", "zone", "dakar");
+            else if (awa.status().pending() == 0) pushed.countDown();
+        });
+        awa.start();
+        assertThat(pushed.await(5, TimeUnit.SECONDS)).isTrue();
+        awa.close();
+    }
+
+    @Test
+    void aWriteDuringAManualRoundIsSyncedSoonAfterIt() throws Exception {
+        AccordClient awa = AccordClient.open(AccordClient.options().schema(SCHEMA).storage(new MemoryStorage())
+                .transport(server.transportFor("awa")).deviceId("awa-bg").syncInterval(Duration.ofSeconds(60)));
+        CountDownLatch first = new CountDownLatch(1);
+        awa.onSynced(c -> first.countDown());
+        awa.start();
+        assertThat(first.await(5, TimeUnit.SECONDS)).isTrue();
+        java.util.concurrent.atomic.AtomicBoolean wrote = new java.util.concurrent.atomic.AtomicBoolean();
+        CountDownLatch pushed = new CountDownLatch(1);
+        awa.onSynced(c -> {
+            if (wrote.compareAndSet(false, true)) awa.assign("dossier:1", "zone", "dakar");
+            else if (awa.status().pending() == 0) pushed.countDown();
+        });
+        awa.sync(); // the write lands inside this round
+        assertThat(pushed.await(5, TimeUnit.SECONDS)).isTrue();
         awa.close();
     }
 

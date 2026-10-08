@@ -86,6 +86,8 @@ public final class AccordClient implements AutoCloseable {
 
     // One round at a time; concurrent callers share it.
     private final Object roundGuard = new Object();
+    /** A write came in during a round (guarded by roundGuard): start another soon after it. */
+    private boolean again;
     private CompletableFuture<Void> round;
     private Thread roundThread;
 
@@ -424,12 +426,17 @@ public final class AccordClient implements AutoCloseable {
     }
 
     private void finishRound(CompletableFuture<Void> f, Throwable error) {
+        boolean more;
         synchronized (roundGuard) {
             round = null;
             roundThread = null;
+            more = again;
+            again = false;
         }
         if (error == null) f.complete(null);
         else f.completeExceptionally(error);
+        // A write during the round is not in it: sync again soon, not after the interval.
+        if (more) soon();
     }
 
     private void runRound() {
@@ -656,7 +663,14 @@ public final class AccordClient implements AutoCloseable {
         synchronized (cond) {
             on = running;
         }
-        if (on && f == 0) schedule(TimeUnit.MILLISECONDS.toNanos(50));
+        if (!on || f != 0) return;
+        synchronized (roundGuard) {
+            if (round != null) {
+                again = true;
+                return;
+            }
+        }
+        schedule(TimeUnit.MILLISECONDS.toNanos(50));
     }
 
     private void loop(int gen) {
@@ -677,7 +691,12 @@ public final class AccordClient implements AutoCloseable {
             }
             try {
                 sync();
-                schedule(syncIntervalNanos);
+                // A write during the round already asked for a sooner one (soon()): keep it.
+                synchronized (cond) {
+                    long next = System.nanoTime() + syncIntervalNanos;
+                    if (nextAt == Long.MAX_VALUE || nextAt - next > 0) nextAt = next;
+                    cond.notifyAll();
+                }
             } catch (RuntimeException error) {
                 int f;
                 synchronized (lock) {
