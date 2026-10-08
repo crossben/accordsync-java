@@ -188,7 +188,7 @@ jobs:
           ./mvnw -B -f examples/spring-boot-app/pom.xml verify
       - name: Start the example app
         run: |
-          nohup java -jar examples/spring-boot-app/target/accordsync-example-spring-boot-app-0.3.0.jar > app.log 2>&1 &
+          nohup java -jar examples/spring-boot-app/target/accordsync-example-spring-boot-app-*.jar > app.log 2>&1 &
           for i in $(seq 1 120); do curl -sf http://127.0.0.1:8731/health && exit 0; sleep 0.5; done
           echo "the example app did not start"; cat app.log; exit 1
       - run: pnpm --filter @accordsync/conformance test
