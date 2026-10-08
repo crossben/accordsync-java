@@ -17,11 +17,11 @@ it wires this module into the app. This page is for another framework, or none.
 <dependency>
   <groupId>io.github.crossben</groupId>
   <artifactId>accordsync-server</artifactId>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
 </dependency>
 ```
 
-Gradle: `implementation("io.github.crossben:accordsync-server:0.3.1")`.
+Gradle: `implementation("io.github.crossben:accordsync-server:0.3.2")`.
 
 Java 17+ and PostgreSQL (the conformance suite and the example app use PostgreSQL 16). It brings
 the PostgreSQL JDBC driver and Nimbus JOSE + JWT; serve it on a connection pool such as HikariCP.

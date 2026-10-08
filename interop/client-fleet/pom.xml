@@ -8,14 +8,14 @@
 
     <groupId>io.github.crossben</groupId>
     <artifactId>accordsync-client-fleet</artifactId>
-    <version>0.3.1</version>
+    <version>0.3.2</version>
     <packaging>jar</packaging>
     <name>Accord Java client fleet</name>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <accordsync.version>0.3.1</accordsync.version>
+        <accordsync.version>0.3.2</accordsync.version>
     </properties>
 
     <dependencyManagement>

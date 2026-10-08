@@ -14,7 +14,7 @@ Spring Boot 4.1, Java 17+. Next to your web starter:
 <dependency>
   <groupId>io.github.crossben</groupId>
   <artifactId>accordsync-spring-boot-starter</artifactId>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
 </dependency>
 <dependency>
   <groupId>org.springframework.boot</groupId>
@@ -25,7 +25,7 @@ Spring Boot 4.1, Java 17+. Next to your web starter:
 Gradle:
 
 ```kotlin
-implementation("io.github.crossben:accordsync-spring-boot-starter:0.3.1")
+implementation("io.github.crossben:accordsync-spring-boot-starter:0.3.2")
 implementation("org.springframework.boot:spring-boot-starter-webmvc")
 ```
 

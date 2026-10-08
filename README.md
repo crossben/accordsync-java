@@ -15,7 +15,7 @@ Two things live here:
   [`@accordsync/server`](https://github.com/crossben/accordsync), so every existing client
   (TypeScript, React Native, Flutter, Python) syncs with it unchanged.
 
-> **Status: v0.3.1.** Pre-1.0: the API may still change between minor versions. Website and docs:
+> **Status: v0.3.2.** Pre-1.0: the API may still change between minor versions. Website and docs:
 > [accord.benhattab.pro](https://accord.benhattab.pro/docs/java/).
 
 Maven (`io.github.crossben`, Java 17+):
@@ -24,20 +24,20 @@ Maven (`io.github.crossben`, Java 17+):
 <dependency>
   <groupId>io.github.crossben</groupId>
   <artifactId>accordsync-client</artifactId>                <!-- the client -->
-  <version>0.3.1</version>
+  <version>0.3.2</version>
 </dependency>
 <dependency>
   <groupId>io.github.crossben</groupId>
   <artifactId>accordsync-spring-boot-starter</artifactId>   <!-- the server, for Spring Boot -->
-  <version>0.3.1</version>
+  <version>0.3.2</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("io.github.crossben:accordsync-client:0.3.1")              // the client
-implementation("io.github.crossben:accordsync-spring-boot-starter:0.3.1") // the server, for Spring Boot
+implementation("io.github.crossben:accordsync-client:0.3.2")              // the client
+implementation("io.github.crossben:accordsync-spring-boot-starter:0.3.2") // the server, for Spring Boot
 ```
 
 The client's SQLite storage needs `org.xerial:sqlite-jdbc` on the classpath (an optional

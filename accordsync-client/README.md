@@ -13,7 +13,7 @@ transport uses `HttpURLConnection`, so it also runs on Android.
 <dependency>
   <groupId>io.github.crossben</groupId>
   <artifactId>accordsync-client</artifactId>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
 </dependency>
 <!-- optional: for JdbcStorage.sqlite(...) -->
 <dependency>
@@ -26,7 +26,7 @@ transport uses `HttpURLConnection`, so it also runs on Android.
 Gradle:
 
 ```kotlin
-implementation("io.github.crossben:accordsync-client:0.3.1")
+implementation("io.github.crossben:accordsync-client:0.3.2")
 implementation("org.xerial:sqlite-jdbc:3.53.4.0") // optional: for JdbcStorage.sqlite(...)
 ```
 

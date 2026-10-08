@@ -10,11 +10,11 @@ the client [`accordsync-client`](../accordsync-client/README.md) or the server
 <dependency>
   <groupId>io.github.crossben</groupId>
   <artifactId>accordsync-core</artifactId>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
 </dependency>
 ```
 
-Gradle: `implementation("io.github.crossben:accordsync-core:0.3.1")`.
+Gradle: `implementation("io.github.crossben:accordsync-core:0.3.2")`.
 
 | Strategy | Merges by |
 | --- | --- |
