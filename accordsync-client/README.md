@@ -1,0 +1,126 @@
+# accordsync-client
+
+**The [Accord](https://accord.benhattab.pro) client for Java: local-first writes, background sync,
+conflicts and refusals.**
+
+A Java or Kotlin program becomes an Accord device like a phone or a browser: it writes to its own
+SQLite database at once, online or not, and syncs with any Accord server (TypeScript, PHP, Python or
+Java). It speaks the same protocol and merges by the same rules as
+[`@accordsync/client`](https://www.npmjs.com/package/@accordsync/client). Java 17+; the HTTP
+transport uses `HttpURLConnection`, so it also runs on Android.
+
+```xml
+<dependency>
+  <groupId>io.github.crossben</groupId>
+  <artifactId>accordsync-client</artifactId>
+  <version>0.3.1</version>
+</dependency>
+<!-- optional: for JdbcStorage.sqlite(...) -->
+<dependency>
+  <groupId>org.xerial</groupId>
+  <artifactId>sqlite-jdbc</artifactId>
+  <version>3.53.4.0</version>
+</dependency>
+```
+
+Gradle:
+
+```kotlin
+implementation("io.github.crossben:accordsync-client:0.3.1")
+implementation("org.xerial:sqlite-jdbc:3.53.4.0") // optional: for JdbcStorage.sqlite(...)
+```
+
+## Open the client
+
+Declare the same schema as your server, then open the client with SQLite storage and the HTTP
+transport.
+
+```java
+import static io.github.crossben.accordsync.core.Strategy.conflict;
+import static io.github.crossben.accordsync.core.Strategy.counter;
+import static io.github.crossben.accordsync.core.Strategy.lww;
+import static io.github.crossben.accordsync.core.Strategy.set;
+
+import io.github.crossben.accordsync.client.AccordClient;
+import io.github.crossben.accordsync.client.HttpTransport;
+import io.github.crossben.accordsync.client.JdbcStorage;
+import io.github.crossben.accordsync.core.Schema;
+import java.util.Map;
+
+Schema schema = Schema.define(Map.of(
+        "dossier", Map.of("agent", lww(), "visits", counter(), "docs", set(), "status", conflict())));
+
+AccordClient accord = AccordClient.open(AccordClient.options()
+        .schema(schema)
+        .storage(JdbcStorage.sqlite("accord.db"))
+        // your app's auth: the supplier is called before every request
+        .transport(new HttpTransport("https://sync.example.com", () -> auth.currentJwt())));
+```
+
+Leave `deviceId(...)` unset: the client generates one from `SecureRandom` and stores it.
+`JdbcStorage.sqlite(path)` owns one SQLite connection; `JdbcStorage.of(connection)` uses a
+connection you own, and `JdbcStorage.of(dataSource)` borrows one per load or commit. Its tables are
+prefixed `accord_`, so they can share your program's database. On Android, where JDBC is not
+available, implement `StorageAdapter`. `MemoryStorage` keeps nothing on disk (tests). Other options:
+`syncInterval`, `minBackoff`, `maxBackoff`, `pushBatch`, `pullLimit`, and an `HttpTransport`
+timeout (30 s by default).
+
+## Write, then sync
+
+Writes apply locally and are saved before they return. Sync on demand, or in the background.
+
+```java
+accord.assign("dossier:91", "agent", "awa");
+accord.inc("dossier:91", "visits", 1);
+accord.add("dossier:91", "docs", "photo-1.jpg");
+
+accord.sync();  // one round: push the pending writes, pull everyone else's
+accord.start(); // or sync on a daemon thread: after writes, every 30 s, backoff on errors
+
+System.out.println(accord.read("dossier:91").map(Json::stringify).orElse("{}"));
+// {"agent":"awa","visits":1,"docs":["photo-1.jpg"]} (field order may differ)
+System.out.println(accord.status().pending()); // writes not yet acknowledged by the server
+
+accord.close(); // stops background sync and closes the storage
+```
+
+`read()` returns an `Optional<JsonObject>` (`io.github.crossben.accordsync.core`); values are
+`JsonValue`s. `assign` and `add` take a `JsonValue` or a plain Java value (strings, numbers,
+booleans, `null`, maps and lists). `AccordClient` is thread-safe and `AutoCloseable`.
+
+## Events and refusals
+
+```java
+Subscription off = accord.onChange(records -> System.out.println("changed: " + records));
+accord.onRefused(r -> System.out.println("refused " + r.record() + "." + r.field() + ": " + r.reason()));
+accord.onError(e -> System.out.println("sync failed, retrying: " + e));
+off.unsubscribe();
+```
+
+The events are `onChange` (records whose local state changed), `onRefused` (a write the server
+refused, already rolled back on this device: tell the user), `onSynced`, `onResync` and `onError`.
+Each returns a `Subscription`. Listeners run on the thread that caused the event.
+
+## Conflicts
+
+A `conflict()` field written concurrently on two devices keeps both values until someone decides.
+
+```java
+for (ConflictInfo c : accord.conflicts()) {
+    System.out.println(c.record() + " " + c.field() + " " + c.values());
+    accord.resolve(c.record(), c.field(), c.values().get(0).value());
+}
+```
+
+While conflicted, `read()` shows the field as `{"conflicted":[{"value":…,"opId":…},…]}`.
+
+## Same behaviour as TypeScript
+
+The merge core ([`accordsync-core`](../accordsync-core/README.md)) passes the shared golden vectors
+in every delivery order and the random vectors generated by the TypeScript core. The repository's
+`interop/client-fleet` harness runs this client against the real TypeScript server, alone and
+together with TypeScript devices over a network that loses requests and responses, and checks every
+device ends with identical data.
+
+Docs: [accord.benhattab.pro/docs/java](https://accord.benhattab.pro/docs/java/) ·
+Source: [crossben/accordsync-java](https://github.com/crossben/accordsync-java) · Licence: Apache-2.0

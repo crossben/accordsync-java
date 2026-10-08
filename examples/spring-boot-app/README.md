@@ -12,7 +12,7 @@ starter serves `/v1/push`, `/v1/pull` and `/health` (plus the "accord" component
 SPRING_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:5432/accord \
 SPRING_DATASOURCE_USERNAME=accord SPRING_DATASOURCE_PASSWORD=accord \
 ACCORD_CONTROL_ENABLED=true ACCORD_PROFILE=contract/conformance/profile.json \
-  java -jar examples/spring-boot-app/target/accordsync-example-spring-boot-app-0.3.0.jar
+  java -jar examples/spring-boot-app/target/accordsync-example-spring-boot-app-0.3.1.jar
 # then, from the Accord repository's app/:
 ACCORD_URL=http://127.0.0.1:8731 ACCORD_CONTROL_URL=http://127.0.0.1:8732 \
   pnpm --filter @accordsync/conformance test
